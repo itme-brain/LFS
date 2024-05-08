@@ -14,17 +14,16 @@
   in with pkgs;
   {
     devShells.${system}.default = mkShell {
-      preShellHook = ''
-      '';
-
       packages = [
         bash
         binutils
         bison
         coreutils
         diffutils
+        dosfstools
         findutils
         gawk
+        git
         gcc
         gnugrep
         gnum4
@@ -34,9 +33,11 @@
         gnutar
         gzip
         linux
+        ondir
         perl
         python3
         texinfo
+        wget
         xz
       ];
 
@@ -44,17 +45,24 @@
         set +h
         umask 022
 
-        LFS=/mnt/lfs
+        LFS=$(git rev-parse --show-toplevel)/lfs
         LC_ALL=POSIX
         LFS_TGT=$(uname -m)-lfs-linux-gnu
         CONFIG_SITE=$LFS/usr/share/config.site
 
         PATH=$PATH:/usr/bin
-        if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
+        if [ ! -L /bin ]; then
+          PATH=/bin:$PATH;
+        fi
         PATH=$LFS/tools/bin:$PATH
 
         export LFS LC_ALL LFS_TGT PATH CONFIG_SITE
         export LD_LIBRARY_PATH=${pkgs.gcc}/lib/
+        export MAKEFLAGS=-j$(nproc)
+
+        if [ ! -d "$LFS" ]; then
+          mkdir -v "$LFS"
+        fi
       '';
     };
   };
