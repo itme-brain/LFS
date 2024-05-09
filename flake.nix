@@ -23,6 +23,7 @@
         dosfstools
         findutils
         gawk
+        git
         gcc
         gnugrep
         gnum4
